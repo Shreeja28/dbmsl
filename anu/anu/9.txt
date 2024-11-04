@@ -1,0 +1,170 @@
+Design and develop MongoDB queries using CRUD operations. (Use CRUD operations, SAVE method, logical operators).
+Queries (with outputs) - 
+1. mydb> db.createCollection("mycollection");
+
+2. mydb> db.mycollection.insertOne({name:"ANUSHREE",age:20});
+
+3. mydb> db.mycollection.find({});
+
+4. mydb>db.mycollection.insertMany([{name:"DHANSHREE",age:21},{name:"SHREEJA",age:19},{name:"ADITYA",age:20}]);
+
+5. mydb> db.mycollection.findOne({name:"ANUSHREE"});
+
+6. mydb> db.mycollection.find({ age: { $gt: 19 } });
+
+7. mydb> db.mycollection.updateOne({name:"ANUSHREE"},{$set:{age:21}});
+
+8. mydb> db.mycollection.updateMany({},{$inc:{age:1}});
+
+9. mydb> db.mycollection.deleteOne({name:"SHREEJA"});
+
+10. mydb> db.mycollection.insertOne({name:"HARSHITA",age:20})
+
+11. mydb> db.mycollection.deleteMany({age:{$lt:21}})
+
+12. mydb> db.mycollection.find({$and:[{name:"ADITYA"},{age:21}]});
+
+13. mydb> db.mycollection.find({$or:[{name:"ADITYA"},{age:23}]});
+
+14. mydb> db.mycollection.countDocuments({});
+
+15. mydb> db.mycollection.countDocuments({age:{$gt:21}})
+
+
+
+-----------------------------------------------------------
+// MongoDB CRUD Operations on the 'employees' collection
+
+// 1. CREATE: Insert documents
+db.employees.insertMany([
+    { _id: 1, name: "Alice", age: 25, city: "New York", position: "Developer" },
+    { _id: 2, name: "Bob", age: 30, city: "Chicago", position: "Manager" },
+    { _id: 3, name: "Charlie", age: 35, city: "San Francisco", position: "Analyst" }
+]);
+
+// 2. READ: Retrieve documents
+
+// Read all documents
+db.employees.find();
+
+// Read documents with a specific filter (e.g., city is "New York")
+db.employees.find({ city: "New York" });
+
+// Read a single document (e.g., name is "Alice")
+db.employees.findOne({ name: "Alice" });
+
+// Read specific fields only (e.g., name and city, excluding _id)
+db.employees.find({}, { name: 1, city: 1, _id: 0 });
+
+// 3. UPDATE: Modify documents
+
+// Update a single document (e.g., change Alice's age to 26)
+db.employees.updateOne(
+    { name: "Alice" },            // Filter
+    { $set: { age: 26 } }         // Update
+);
+
+// Update multiple documents (e.g., change city from "Chicago" to "Los Angeles")
+db.employees.updateMany(
+    { city: "Chicago" },          // Filter
+    { $set: { city: "Los Angeles" } }  // Update
+);
+
+// Replace a document completely (replace Bob's document with a new one)
+db.employees.replaceOne(
+    { name: "Bob" },              // Filter
+    { _id: 2, name: "Bobby", age: 32, city: "Seattle", position: "Director" }
+);
+
+// 4. DELETE: Remove documents
+
+// Delete a single document (e.g., remove Charlie's document)
+db.employees.deleteOne({ name: "Charlie" });
+
+// Delete multiple documents (e.g., remove all employees in "Los Angeles")
+db.employees.deleteMany({ city: "Los Angeles" });
+
+// Verify remaining documents
+db.employees.find();
+
+// MongoDB CRUD Operations on the 'employees' collection with Logical and Count Operations
+
+// 1. CREATE: Insert documents
+db.employees.insertMany([
+    { _id: 1, name: "Alice", age: 25, city: "New York", position: "Developer" },
+    { _id: 2, name: "Bob", age: 30, city: "Chicago", position: "Manager" },
+    { _id: 3, name: "Charlie", age: 35, city: "San Francisco", position: "Analyst" },
+    { _id: 4, name: "David", age: 29, city: "New York", position: "Designer" },
+    { _id: 5, name: "Eve", age: 40, city: "Chicago", position: "Manager" }
+]);
+
+// 2. READ: Retrieve documents
+
+// Read all documents
+db.employees.find();
+
+// Read documents using logical operators
+
+// a) Using $and to find employees in "New York" who are older than 25
+db.employees.find({
+    $and: [{ city: "New York" }, { age: { $gt: 25 } }]
+});
+
+// b) Using $or to find employees who are either Managers or Analysts
+db.employees.find({
+    $or: [{ position: "Manager" }, { position: "Analyst" }]
+});
+
+// c) Using $not to exclude employees younger than 30
+db.employees.find({
+    age: { $not: { $lt: 30 } }
+});
+
+// d) Using $nor to find employees who are neither Managers nor Analysts
+db.employees.find({
+    $nor: [{ position: "Manager" }, { position: "Analyst" }]
+});
+
+// 3. COUNT: Count documents
+
+// Count all documents in the collection
+db.employees.countDocuments();
+
+// Count employees who are Managers
+db.employees.countDocuments({ position: "Manager" });
+
+// Count employees in "New York" who are older than 25
+db.employees.countDocuments({
+    $and: [{ city: "New York" }, { age: { $gt: 25 } }]
+});
+
+// 4. UPDATE: Modify documents
+
+// Update a single document (e.g., change Alice's age to 26)
+db.employees.updateOne(
+    { name: "Alice" },
+    { $set: { age: 26 } }
+);
+
+// Update multiple documents (e.g., change city from "Chicago" to "Los Angeles")
+db.employees.updateMany(
+    { city: "Chicago" },
+    { $set: { city: "Los Angeles" } }
+);
+
+// Replace a document completely (replace Bob's document with a new one)
+db.employees.replaceOne(
+    { name: "Bob" },
+    { _id: 2, name: "Bobby", age: 32, city: "Seattle", position: "Director" }
+);
+
+// 5. DELETE: Remove documents
+
+// Delete a single document (e.g., remove Charlie's document)
+db.employees.deleteOne({ name: "Charlie" });
+
+// Delete multiple documents (e.g., remove all employees in "Los Angeles")
+db.employees.deleteMany({ city: "Los Angeles" });
+
+// Verify remaining documents
+db.employees.find();

@@ -1,0 +1,199 @@
+//for vscode
+//in cmd
+CREATE USER 'root'@'10.10.13.245' IDENTIFIED BY 'Barve@699';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'10.10.13.245' WITH GRANT OPTION;
+
+//eclips
+package jdbc;
+import java.sql.*;
+import java.util.Scanner;
+
+public class Jdbc {
+    private static Connection getConnection() throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306/te31408_db", "root", "Barve@123");
+    }
+
+    private static void insertRecord(Statement statement, Scanner scanner) throws SQLException {
+        System.out.print("Enter ID to insert: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+        System.out.print("Enter Name to insert: ");
+        String name = scanner.nextLine();
+        String query = "INSERT INTO con1 (id, name) VALUES (" + id + ", '" + name + "')";
+        int rowsAffected = statement.executeUpdate(query);
+        System.out.println("Inserted " + rowsAffected + " row(s).");
+    }
+
+    private static void deleteRecord(Statement statement, Scanner scanner) throws SQLException {
+        System.out.print("Enter ID to delete: ");
+        int id = scanner.nextInt();
+        String query = "DELETE FROM con1 WHERE id=" + id;
+        int rowsAffected = statement.executeUpdate(query);
+        System.out.println("Deleted " + rowsAffected + " row(s).");
+    }
+
+    private static void updateRecord(Statement statement, Scanner scanner) throws SQLException {
+        System.out.print("Enter ID to update: ");
+        int id = scanner.nextInt();
+        System.out.print("Enter new name: ");
+        scanner.nextLine();
+        String name = scanner.nextLine();
+        String query = "UPDATE con1 SET name='" + name + "' WHERE id=" + id;
+        int rowsAffected = statement.executeUpdate(query);
+        System.out.println("Updated " + rowsAffected + " row(s).");
+    }
+
+    private static void selectRecords(Statement statement) throws SQLException {
+        String query = "SELECT * FROM con1";
+        ResultSet resultSet = statement.executeQuery(query);
+        while (resultSet.next()) {
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            System.out.println("ID: " + id + ", Name: " + name);
+        }
+        resultSet.close();
+    }
+
+    public static void main(String[] args) {
+        try (Scanner scanner = new Scanner(System.in);
+             Connection connection = getConnection();
+             Statement statement = connection.createStatement()) {
+            int choice;
+            do {
+                System.out.println("1. Insert Record");
+                System.out.println("2. Delete Record");
+                System.out.println("3. Update Record");
+                System.out.println("4. Select Records");
+                System.out.println("5. Exit");
+                System.out.print("Enter your choice: ");
+                choice = scanner.nextInt();
+                switch (choice) {
+                    case 1:
+                        insertRecord(statement, scanner);
+                        break;
+                    case 2:
+                        deleteRecord(statement, scanner);
+                        break;
+                    case 3:
+                        updateRecord(statement, scanner);
+                        break;
+                    case 4:
+                        selectRecords(statement);
+                        break;
+                    case 5:
+                        System.out.println("Exiting...");
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                        break;
+                }
+            } while (choice != 5);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+-----------------------------------------------------------
+module jdbc {
+	requires java.sql;
+}
+
+
+package finalproject;
+
+import java.sql.*;
+import java.util.Scanner;
+
+public class onee {
+
+    private static Connection getConnection() throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306/te31408_db", "root", "Barve@123");
+    }
+
+    private static void insertRecord(Statement statement, Scanner scanner) throws SQLException {
+        System.out.print("Enter ID to insert: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+        System.out.print("Enter Name to insert: ");
+        String name = scanner.nextLine();
+        String query = "INSERT INTO con1 (id, name) VALUES (" + id + ", '" + name + "')";
+        int rowsAffected = statement.executeUpdate(query);
+        System.out.println("Inserted " + rowsAffected + " row(s).");
+    }
+
+    private static void deleteRecord(Statement statement, Scanner scanner) throws SQLException {
+        System.out.print("Enter ID to delete: ");
+        int id = scanner.nextInt();
+        String query = "DELETE FROM con1 WHERE id=" + id;
+        int rowsAffected = statement.executeUpdate(query);
+        System.out.println("Deleted " + rowsAffected + " row(s).");
+    }
+
+    private static void updateRecord(Statement statement, Scanner scanner) throws SQLException {
+        System.out.print("Enter ID to update: ");
+        int id = scanner.nextInt();
+        System.out.print("Enter new name: ");
+        scanner.nextLine(); // Consume newline
+        String name = scanner.nextLine();
+        String query = "UPDATE con1 SET name='" + name + "' WHERE id=" + id;
+        int rowsAffected = statement.executeUpdate(query);
+        System.out.println("Updated " + rowsAffected + " row(s).");
+    }
+
+    private static void selectRecords(Statement statement) throws SQLException {
+        String query = "SELECT * FROM con1";
+        ResultSet resultSet = statement.executeQuery(query);
+        while (resultSet.next()) {
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            System.out.println("ID: " + id + ", Name: " + name);
+        }
+        resultSet.close();
+    }
+
+    public static void main(String[] args) {
+        try (Scanner scanner = new Scanner(System.in);
+             Connection connection = getConnection();
+             Statement statement = connection.createStatement()) {
+
+            int choice;
+            do {
+                System.out.println("1. Insert Record");
+                System.out.println("2. Delete Record");
+                System.out.println("3. Update Record");
+                System.out.println("4. Select Records");
+                System.out.println("5. Exit");
+                System.out.print("Enter your choice: ");
+                choice = scanner.nextInt();
+
+                switch (choice) {
+                    case 1:
+                        insertRecord(statement, scanner);
+                        break;
+                    case 2:
+                        deleteRecord(statement, scanner);
+                        break;
+                    case 3:
+                        updateRecord(statement, scanner);
+                        break;
+                    case 4:
+                        selectRecords(statement);
+                        break;
+                    case 5:
+                        System.out.println("Exiting...");
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                        break;
+                }
+            } while (choice != 5);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+

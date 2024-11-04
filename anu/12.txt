@@ -1,0 +1,206 @@
+package Example1;
+
+import java.util.Scanner;
+
+import com.mongodb.MongoClient;
+
+import com.mongodb.client.MongoDatabase;
+
+import com.mongodb.client.MongoCollection;
+
+import org.bson.Document;
+
+
+
+
+
+public class Mongo1 {
+
+	public static void main(String[]args) {
+
+		MongoClient client=new MongoClient("127.0.0.1",27017);
+
+		System.out.println("Connected to mongodb");
+
+		MongoDatabase db=client.getDatabase("newdb");
+
+		MongoCollection<Document>col=db.getCollection("student");
+
+		Scanner sc=new Scanner(System.in);
+
+		
+
+		while(true) {
+
+			System.out.println("Enter choice \n1)Insert\n 2)Update  \n3)Delete \n4)Show \n5) Exit");
+
+			int op = sc.nextInt();
+
+			sc.nextLine();
+
+			
+
+			switch (op) {
+
+			case 1:
+
+				insert(col,sc);
+
+				break;
+
+			case 2:
+
+				update(col,sc);
+
+				break;
+
+			case 3:
+
+				delete(col,sc);
+
+				break;
+
+			case 4:
+
+				show(col,sc);
+
+				break;
+
+			case 5:
+
+				System.out.println("Exiting");
+
+				return;
+
+			default:
+
+				System.out.println("Invalid option");
+
+			}
+
+		}
+
+	
+
+	}
+
+	
+
+	private static void insert(MongoCollection<Document>col,Scanner sc) {
+
+		System.out.println("Enter roll : ");
+
+		int roll = sc.nextInt();
+
+		sc.nextLine();
+
+		System.out.println("Name : ");
+
+		String name = sc.nextLine();
+
+		System.out.println("Marks");
+
+		int marks=sc.nextInt();
+
+		sc.nextLine();
+
+		System.out.println("Fav_game : ");
+
+		String fav=sc.nextLine();
+
+		
+
+		Document doc=new Document("Roll_no",roll)
+
+				.append("Name", name)
+
+				.append("Marks", marks)
+
+				.append("Fav_game", fav);
+
+		col.insertOne(doc);
+
+		System.out.println("Added Successfully");
+
+		
+
+	}
+
+		
+
+	private static void update(MongoCollection<Document>col,Scanner sc) {
+
+		System.out.println("Enter roll to update : ");
+
+		int roll = sc.nextInt();
+
+		sc.nextLine();
+
+		System.out.println("Name : ");
+
+		String name = sc.nextLine();
+
+		System.out.println("Marks");
+
+		int marks=sc.nextInt();
+
+		sc.nextLine();
+
+		System.out.println("Fav_game : ");
+
+		String fav=sc.nextLine();
+
+		
+
+		Document filter =new Document("Roll_no",roll);
+
+		Document doc=new 
+
+				Document("Name", name)
+
+				.append("Marks", marks)
+
+				.append("Fav_game", fav);
+
+		col.updateOne(filter, new Document("$set",doc));
+
+		System.out.println("Added Successfully");
+
+			
+
+	}
+
+	private static void delete(MongoCollection<Document>col,Scanner sc) {
+
+		System.out.println("Enter roll to Delete : ");
+
+		int roll = sc.nextInt();
+
+		sc.nextLine();
+
+		Document doc=new Document("Roll_no",roll);
+
+		col.deleteOne(doc);
+
+		System.out.println("Student deleted Successfully");
+
+	}
+
+	private static void show(MongoCollection<Document>col,Scanner sc) {
+
+		
+
+		for(Document doc:col.find()) {
+
+			System.out.println(doc.toJson());
+
+		}
+
+		
+
+	}
+
+
+
+}
+

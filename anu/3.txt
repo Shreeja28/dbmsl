@@ -1,0 +1,247 @@
+Assignment Queries:
+
+1. Find the Student details and Placement details using NATURAL JOIN.
+
+select * from Student natural join PlacementDrive;
+
+2. Find all the student details with company_name who have conducted in same drive.
+
+SELECT s1.drive_id, s1.s_id, s1.s_name, s1.cgpa, s1.s_branch, s1.s_dob FROM Student s1 JOIN Student s2 ON s1.drive_id = s2.drive_id AND s1.s_id <> s2.s_id JOIN PlacementDrive pd ON s1.drive_id = pd.drive_id;
+
+3. List all the Student name and Student branch of Student having package 7 LPA.......
+
+SELECT s.s_name, s.s_branch 
+FROM Student s 
+JOIN PlacementDrive p ON s.drive_id = p.drive_id 
+WHERE p.package = 700000;
+
+4. List all the student names ,company_name having T_fee more than 700000.
+
+select s.s_name,t.Tcompany_name from Student s join Training t on s.T_id=t.T_id where T_Fee>700000;
+
+5. Display all training details attended by “Siddhi Borse” in year 2019.
+
+select * from Training t join Student s. on t.T_id=s.T_id where s.s_name=’Siddhi Borse’ and t.T_date=’2019-12-17’;
+
+6. List the total number of companies who conduct training before 2020.
+
+select Tcompany_name,T_id from Training where T_date<'2020-12-31';
+
+7. List the students name with company ‘XYZ Corporation’ and location ’Mumbai’.
+
+SELECT s.s_name FROM Student s JOIN PlacementDrive p ON s.drive_id = p.drive_id WHERE p,Pcompany_name=’XYZ Corporation’ and p.location=’Mumbai’;
+
+8. Find the names of all Students who have joined ‘Tech Solutions Inc.‘ training in 2015 .
+
+Query for maximum cgpa:
+SELECT s_name FROM Student s join Training t on s.T_id=t.T_id where t.Tcompany_name=’Tech Solutions Inc.’ and year(t.T_date)=2019;
+
+9. Create a view showing the Student and Training details.
+
+create view studtrain as select Student.s_id,Student.s_name,Student.drive_id,Student.T_id,Training.Tcompany_name,Trainig.T_Fee from Student,Training where Student.T_id=Training.T_id;
+
+10. Perform Manipulation on simple view-Insert, update, delete, drop view.
+
+Create Simple View Query:
+create view simplestud as select * from Student;
+
+Insert Query:
+insert into simplestud values(20,5,103,'Sampada Kulkarni',9.56,'Computer Engineering',’2000-12-29’);
+
+Update Query:
+update simplestud set cgpa=9.32 where cgpa between 9.6 and 9.7;
+
+Delete Query:
+delete from simplestud where s_id=7;
+
+Drop Query:
+drop view simplestud;
+-------------------------------------------------------
+proper code
+Assignment 3B
+
+Assignment Queries:
+1. Find the Student details and Placement details using NATURAL JOIN.
+Query:
+select * from Student natural join PlacementDrive;
+
+
+2. Find all the student details with company_name who have conducted in same drive
+Query:
+SELECT s.*, pd.Pcompany_name FROM Student s INNER JOIN PlacementDrive pd ON
+s.Drive_id = pd.Drive_id;
+
+
+3. List all the Student name and Student branch of Student having package 30 LPA
+Query:
+SELECT s.s_name, s.s_branch FROM Student s JOIN PlacementDrive pd ON s.Drive_id =
+pd.Drive_id WHERE pd.package = 30;
+
+
+4. List all the student names ,company_name having T_fee more than 500.
+Query:
+SELECT s.s_name, t.Tcompany_name
+FROM Student s
+JOIN Training t ON s.T_id = t.T_id
+WHERE t.T_Fee > 500;
+
+
+5. Display all training details attended by “Hashim Babat” in year 2021
+Query:
+SELECT t.*
+FROM Training t
+JOIN Student s ON t.T_id = s.T_id
+WHERE s.s_name = 'Hashim Babat' AND YEAR(t.T_year) = 2021;
+
+
+6. list the total number of companies who conduct training before 2022
+Query:
+SELECT COUNT(DISTINCT Tcompany_name) AS total_companies
+FROM Training
+WHERE T_year < 2022;
+
+
+7. List the students name with company ‘Microsoft’ and location ’Seattle’
+Query:
+SELECT s.s_name
+FROM Student s
+JOIN PlacementDrive pd ON s.Drive_id = pd.Drive_id
+WHERE pd.Pcompany_name = 'Microsoft' AND pd.location = 'Seattle';
+
+
+8. Find the names of all Students who have joined ‘Microsoft ‘ training in 2023.
+Query:
+SELECT s.s_name
+FROM Student s
+JOIN Training t ON s.T_id = t.T_id
+WHERE t.Tcompany_name = 'Microsoft' AND t.T_year = 2023;
+
+
+9. Create a view showing the Student and Training details.
+Query:
+CREATE VIEW Student_Training_View AS
+SELECT s.s_id, s.s_name, s.s_branch, t.Tcompany_name, t.T_Fee, t.T_date
+FROM Student s
+JOIN Training t ON s.T_id = t.T_id;
+
+
+10. Perform Manipulation on simple view-Insert, update, delete, drop view.
+Creation of a Simple View :
+
+Query 1 : INSERT
+insert into Student_view(s_id,s_name,CGPA,s_branch) values (1201,'Ketan Bajaj',8.9,'Computer
+Science'),(1202,'Anish Dabhane',9.34,'Information Technology');
+
+
+Query 2 : UPDATE
+update Student_view set CGPA=10.00 where s_name='Hashim Babat';
+
+
+Query 3 : DELETE
+delete from Student_view where s_name=’Niranjan Dangi’;
+
+Query 4 : DROP
+drop view Student_view;
+
+
+-----------------------------------------------------------
+another code dept project
+
+-- Table Creation Statements
+CREATE TABLE Dept (
+    Dept_id INT PRIMARY KEY,
+    Dept_location VARCHAR(20),
+    Dept_name VARCHAR(20)
+);
+
+CREATE TABLE Employee (
+    Emp_id INT PRIMARY KEY,
+    Dept_id INT,
+    Emp_fname VARCHAR(20),
+    Emp_lname VARCHAR(20),
+    Emp_Position VARCHAR(20),
+    Emp_salary INT,
+    Emp_JoinDate DATE,
+    FOREIGN KEY (Dept_id) REFERENCES Dept(Dept_id) ON DELETE CASCADE
+);
+
+CREATE TABLE Project (
+    Proj_id INT,
+    Dept_id INT,
+    Proj_name VARCHAR(20),
+    Proj_Location VARCHAR(20),
+    Proj_cost INT,
+    Proj_year YEAR,
+    FOREIGN KEY (Dept_id) REFERENCES Dept(Dept_id) ON DELETE CASCADE
+);
+
+-- Queries
+
+-- 1. Find Employee and Department details using NATURAL JOIN
+SELECT * FROM Employee NATURAL JOIN Dept;
+
+-- 2. Find emp_fname, Emp_position, Dept_location, Emp_JoinDate for employees with the same Dept_id
+SELECT e.Emp_fname, e.Emp_position, d.Dept_location, e.Emp_JoinDate
+FROM Employee e
+INNER JOIN Dept d ON e.Dept_id = d.Dept_id;
+
+-- 3. Find Employee details, Proj_id, Project cost for projects not located in Hyderabad
+SELECT e.*, p.Proj_id, p.Proj_cost
+FROM Employee e
+INNER JOIN Project p ON e.Dept_id = p.Dept_id
+WHERE p.Proj_Location <> 'Hyderabad';
+
+-- 4. Update project year to 2020 for a specific project and fetch details for projects from 2020
+UPDATE Project SET Proj_year = 2020 WHERE Proj_id = 10;
+SELECT d.Dept_name, e.Emp_fname, e.Emp_lname, e.Emp_Position
+FROM Employee e
+INNER JOIN Dept d ON e.Dept_id = d.Dept_id
+INNER JOIN Project p ON e.Dept_id = p.Dept_id
+WHERE p.Proj_year = 2020;
+
+-- 5. Display emp_position and Dept_name for projects with cost > 30000
+SELECT DISTINCT e.Emp_Position, d.Dept_name
+FROM Employee e
+INNER JOIN Dept d ON e.Dept_id = d.Dept_id
+INNER JOIN Project p ON e.Dept_id = p.Dept_id
+WHERE p.Proj_cost > 30000;
+
+-- 6. Update project year to 2015 for a specific project and list projects that started in 2015
+UPDATE Project SET Proj_year = 2015 WHERE Proj_id = 10;
+SELECT Proj_name
+FROM Project
+WHERE Proj_year = 2015;
+
+-- 7. List Dept_name with exactly 10 employees
+SELECT d.Dept_name
+FROM Dept d
+INNER JOIN Employee e ON d.Dept_id = e.Dept_id
+GROUP BY d.Dept_name
+HAVING COUNT(e.Emp_id) = 10;
+
+-- 8. Display the total number of employees who joined any project before 2009
+SELECT COUNT(DISTINCT e.Emp_id)
+FROM Employee e
+INNER JOIN Project p ON e.Dept_id = p.Dept_id
+WHERE p.Proj_year < 2009;
+
+-- 9. Create a view for Employee and Department details
+CREATE VIEW Emp_Dept_View AS
+SELECT e.Emp_fname, d.Dept_location
+FROM Employee e
+INNER JOIN Dept d ON e.Dept_id = d.Dept_id;
+
+-- 10. Manipulate the view - Insert, Update, Delete, Drop
+-- In MySQL, simple views might not be directly updatable if they don’t meet specific criteria. 
+-- Here’s the workaround for manipulating data through a view if allowed by MySQL.
+
+-- Insert data directly into the base tables since MySQL may not allow inserting into a view like this.
+
+INSERT INTO Employee (Emp_id, Dept_id, Emp_fname, Emp_lname, Emp_Position, Emp_salary, Emp_JoinDate)
+VALUES (101, 1, 'Niranjan', 'Kumar', 'Manager', 50000, '2023-01-01');
+
+-- Update within the view if allowed by MySQL (or update the base table directly)
+UPDATE Employee SET Emp_fname = 'Niranjan Dangi' WHERE Emp_fname = 'Niranjan';
+
+-- Drop the view
+DROP VIEW Emp_Dept_View;

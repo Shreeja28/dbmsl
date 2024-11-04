@@ -1,0 +1,72 @@
+Cursors-(All types: Implicit, Explicit, Cursor FOR Loop, Parameterized Cursor) Write a PL/SQL block of code using parameterized Cursor, that will merge the data available in the newly created table N_EmpId with data available in the table O_EmpId. If the data in the first table already exist in the second table then that data should be skipped.
+
+Create the tables
+CREATE TABLE O_EmpId (
+    id INT PRIMARY KEY,
+    name VARCHAR(30)
+);
+
+CREATE TABLE N_EmpId (
+    id INT PRIMARY KEY,
+    name VARCHAR(30)
+);
+
+-- Step 3: Insert sample data into the O_EmpId table
+INSERT INTO O_EmpId (id, name) VALUES 
+(1, 'Alice'),
+(2, 'Bob'),
+(3, 'Charlie'),
+(4, 'David');
+
+-- Insert sample data into the N_EmpId table
+INSERT INTO N_EmpId (id, name) VALUES 
+(3, 'Charlie'),  -- Existing record (should be skipped)
+(4, 'David'),    -- Existing record (should be skipped)
+(5, 'Eve');      -- New record (should be inserted)
+
+-- Step 4: Create a procedure with a parameterized cursor to merge data
+DELIMITER //
+
+CREATE PROCEDURE mergeData(IN sourceTable VARCHAR(30))
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE cid INT;
+    DECLARE cname VARCHAR(30);
+
+    -- Prepare the cursor for the N_EmpId table
+    DECLARE cur CURSOR FOR SELECT id, name FROM N_EmpId;
+    
+    -- Declare a handler to set `done` to TRUE when there are no more rows to fetch
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    -- Open the cursor
+    OPEN cur;
+
+    -- Start the loop to fetch records
+    read_loop: LOOP
+        FETCH cur INTO cid, cname;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Check if the record does not exist in O_EmpId, then insert it
+        IF NOT EXISTS (SELECT 1 FROM O_EmpId WHERE id = cid) THEN
+            INSERT INTO O_EmpId (id, name) VALUES (cid, cname);
+        END IF;
+
+    END LOOP;
+
+    -- Close the cursor
+    CLOSE cur;
+
+    SELECT 'Data merged successfully' AS message;  -- Output message to indicate completion
+END //
+
+DELIMITER ;
+
+-- Step 5: Execute the procedure to merge data from N_EmpId to O_EmpId
+CALL mergeData('N_EmpId');
+
+-- Step 6: Verify the merged data
+SELECT * FROM O_EmpId;  -- Check the contents of O_EmpId

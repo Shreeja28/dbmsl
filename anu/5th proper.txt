@@ -1,0 +1,126 @@
+Named PL/SQL Block: PL/SQL Stored Procedure and Stored Function.
+Write a Stored Procedure namely proc_Grade for the categorization of student. If marks scored by students in examination is <=1500 and marks>=990 then student will be placed in distinction category if marks scored are between 989 and 900 category is first class, if marks 899 and 825 category is Higher Second Class.
+Write a PL/SQLblock to use procedure created with above requirement.
+Stud_Marks(name, total_marks)
+Result(Roll,Name, Class)
+
+
+-- Create stud_marks table
+CREATE TABLE stud_marks (
+    rollno INT PRIMARY KEY,
+    name VARCHAR(30),
+    totalmarks INT
+);
+
+-- Create result table with v_name column
+CREATE TABLE result (
+    rollno INT,
+    v_name VARCHAR(30), 
+    class VARCHAR(30),
+    FOREIGN KEY (rollno) REFERENCES stud_marks(rollno)
+);
+
+-- Insert records into stud_marks table
+INSERT INTO stud_marks (rollno, name, totalmarks) VALUES
+(1, 'John Doe', 1500),
+(2, 'Jane Smith', 950),
+(3, 'Alice Johnson', 880),
+(4, 'Bob Brown', 600),
+(5, 'Charlie Black', 1000);
+
+-- Create the stored procedure
+DELIMITER //
+
+CREATE PROCEDURE grade(IN rollnum INT)
+BEGIN
+    DECLARE student_name VARCHAR(30);
+    DECLARE category VARCHAR(30);
+    DECLARE marks INT;
+
+    -- Select marks and name based on roll number
+    SELECT totalmarks, name
+    INTO marks, student_name
+    FROM stud_marks
+    WHERE rollno = rollnum;
+
+    -- Check for invalid roll number (marks will be NULL if no record is found)
+    IF marks IS NULL THEN
+        SELECT 'INVALID ROLL NUMBER!!!' AS message;
+    ELSE
+        -- Determine category based on marks
+        IF marks >= 990 AND marks <= 1500 THEN
+            SET category = 'Distinction';
+        ELSEIF marks >= 900 AND marks < 990 THEN
+            SET category = 'First Class';
+        ELSEIF marks >= 825 AND marks < 900 THEN
+            SET category = 'Second Class';
+        ELSE
+            SET category = 'Fail';
+        END IF;
+
+        -- Insert into result table (ensure it doesn't cause a duplicate)
+        INSERT INTO result (rollno, v_name, class) VALUES (rollnum, student_name, category);
+        SELECT 'Result inserted into table' AS Message;
+    END IF;
+END //
+
+DELIMITER ;
+
+-- Create the function
+DELIMITER //
+
+CREATE FUNCTION grading(rollnum INT) RETURNS VARCHAR(255)
+DETERMINISTIC
+BEGIN
+    DECLARE student_name VARCHAR(30);
+    DECLARE category VARCHAR(30);
+    DECLARE marks INT;
+    DECLARE resultMessage VARCHAR(255);
+
+    -- Select marks and name based on roll number
+    SELECT totalmarks, name
+    INTO marks, student_name
+    FROM stud_marks
+    WHERE rollno = rollnum;
+
+    -- Check for invalid roll number
+    IF marks IS NULL THEN
+        SET resultMessage = 'INVALID ROLL NUMBER!!!';
+    ELSE
+        -- Determine category based on marks
+        IF marks >= 990 AND marks <= 1500 THEN
+            SET category = 'Distinction';
+        ELSEIF marks >= 900 AND marks < 990 THEN
+            SET category = 'First Class';
+        ELSEIF marks >= 825 AND marks < 900 THEN
+            SET category = 'Second Class';
+        ELSE
+            SET category = 'Fail';
+        END IF;
+
+        -- Insert into result table
+        INSERT INTO result (rollno, v_name, class) VALUES (rollnum, student_name, category);
+        SET resultMessage = 'Result inserted into table';
+    END IF;
+
+    RETURN resultMessage;
+END //
+
+DELIMITER ;
+
+-- Call the stored procedure for each student
+CALL grade(1);  -- John Doe
+CALL grade(2);  -- Jane Smith
+CALL grade(3);  -- Alice Johnson
+CALL grade(4);  -- Bob Brown
+CALL grade(5);  -- Charlie Black
+
+-- Retrieve results from result table
+SELECT * FROM result;
+
+-- Call the function for grading and display results
+SELECT grading(1) AS GradeResult;  -- John Doe
+SELECT grading(2) AS GradeResult;  -- Jane Smith
+SELECT grading(3) AS GradeResult;  -- Alice Johnson
+SELECT grading(4) AS GradeResult;  -- Bob Brown
+SELECT grading(5) AS GradeResult;  -- Charlie Black

@@ -1,0 +1,147 @@
+1.) Unnamed PL/SQL code block: Use of Control structure and Exception handling is mandatory. Write a PL/SQL block of code for the following requirements:-
+Schema:
+1. Borrower(Roll,Name,DateofIssue, NameofBook, Status)
+2. Fine (Roll, Date, Amt)
+Accept Roll & N ame of book from user. Check the number of days (from date of issue), if days are between 15 to 30 then fine amount will be Rs 5per day. If no. of days>30, per day fine will be Rs 50 per day & for days less than 30, Rs. 5 per day. After submitting the book, status will change from I to R. If condition of fine is true, then details will be stored into fine table
+
+
+CREATE TABLE borrowers (
+    roll_no INT PRIMARY KEY,
+    name VARCHAR(20),
+    issue_date DATE,
+    book_name VARCHAR(20),
+    status CHAR(10)
+);
+
+CREATE TABLE fines (
+    roll_no INT,
+    fine_date DATE,
+    amt INT,
+    FOREIGN KEY (roll_no) REFERENCES borrowers(roll_no)
+);
+
+INSERT INTO borrowers (roll_no, name, issue_date, book_name, status) VALUES
+(1, 'p1', '2024-07-31', 'b1', 'I'),
+(2, 'p2', '2024-07-17', 'b2', 'I'),
+(3, 'p2', '2024-06-18', 'b3', 'I'),
+(4, 'p2', '2024-07-16', 'b1', 'I'),
+(5, 'p2', '2024-07-01', 'b2', 'I'),
+(6, 'p2', '2024-06-10', 'b3', 'I');
+
+DELIMITER //
+
+CREATE PROCEDURE CalculateFine(IN roll_no INT, IN name_of_book VARCHAR(100))
+BEGIN
+    DECLARE date_of_issue DATE;
+    DECLARE days_diff INT;
+    DECLARE fine_amt INT DEFAULT 0;
+
+    SELECT issue_date INTO date_of_issue 
+    FROM borrowers 
+    WHERE roll_no = roll_no AND book_name = name_of_book
+    LIMIT 1;
+
+    IF date_of_issue IS NOT NULL THEN
+        SET days_diff = DATEDIFF(CURDATE(), date_of_issue);
+
+        IF days_diff > 30 THEN
+            SET fine_amt = (days_diff - 30) * 50;
+        ELSEIF days_diff > 15 THEN
+            SET fine_amt = (days_diff - 14) * 5;
+        END IF;
+
+        IF fine_amt > 0 THEN
+            INSERT INTO fines (roll_no, fine_date, amt) VALUES (roll_no, CURDATE(), fine_amt);
+            UPDATE borrowers SET status = 'R' WHERE roll_no = roll_no AND book_name = name_of_book;
+            SELECT CONCAT('Fine recorded: Rs ', fine_amt) AS Message;
+        ELSE
+            SELECT 'No fine applicable.' AS Message;
+        END IF;
+    ELSE
+        SELECT 'Record not found for given roll_no and book.' AS Message;
+    END IF;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE CalculateFineWithException(IN roll_no INT, IN name_of_book VARCHAR(100))
+BEGIN
+    DECLARE date_of_issue DATE;
+    DECLARE days_diff INT;
+    DECLARE fine_amt INT DEFAULT 0;
+    DECLARE msg VARCHAR(255);
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1 msg = MESSAGE_TEXT;
+        SELECT CONCAT('Error: ', msg) AS Message;
+    END;
+
+    SELECT issue_date INTO date_of_issue 
+    FROM borrowers 
+    WHERE roll_no = roll_no AND book_name = name_of_book
+    LIMIT 1;
+
+    IF date_of_issue IS NOT NULL THEN
+        SET days_diff = DATEDIFF(CURDATE(), date_of_issue);
+
+        IF days_diff > 30 THEN
+            SET fine_amt = (days_diff - 30) * 50;
+        ELSEIF days_diff > 15 THEN
+            SET fine_amt = (days_diff - 14) * 5;
+        END IF;
+
+        IF fine_amt > 0 THEN
+            INSERT INTO fines (roll_no, fine_date, amt) VALUES (roll_no, CURDATE(), fine_amt);
+            UPDATE borrowers SET status = 'R' WHERE roll_no = roll_no AND book_name = name_of_book;
+            SELECT CONCAT('Fine recorded: Rs ', fine_amt) AS Message;
+        ELSE
+            SELECT 'No fine applicable.' AS Message;
+        END IF;
+    ELSE
+        SELECT 'Record not found for given roll_no and book.' AS Message;
+    END IF;
+END //
+
+DELIMITER ;
+
+-- Example 1: Calculate fine for roll_no 1 and book 'b1'
+CALL CalculateFine(1, 'b1');
+
+-- Example 2: Calculate fine for roll_no 2 and book 'b2' with exception handling
+CALL CalculateFineWithException(2, 'b2');
+
+
+
+
+
+2. Write a PLSQL code block to calculate the area of a circle for a value of radius varying from S to 9. Store the radius and the corresponding values of calculated area in an empty table named areas, consisting of two columns, radius and area
+
+CREATE TABLE IF NOT EXISTS Areas (
+    radius INT,
+    area DOUBLE
+);
+
+DELIMITER //
+
+CREATE PROCEDURE calculate_circle_area()
+BEGIN
+    DECLARE new_radius INT DEFAULT 5;  -- Start with radius 5
+    DECLARE new_area DOUBLE;             -- Variable to hold calculated area
+    DECLARE pi DOUBLE DEFAULT 3.14159;  -- Value of Pi
+
+    -- Loop to calculate area for radius from 5 to 9
+    WHILE new_radius <= 9 DO
+        SET new_area = pi * POW(new_radius, 2);  -- Calculate area
+        INSERT INTO Areas (radius, area) VALUES (new_radius, new_area);  -- Insert into table
+        SET new_radius = new_radius + 1;  -- Increment radius
+    END WHILE;
+END //
+
+DELIMITER ;
+
+CALL calculate_circle_area();
+
+SELECT * FROM Areas;

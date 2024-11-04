@@ -1,0 +1,214 @@
+MongoDB Map-reduces operations: Implement Map reduces operation with suitable example using MongoDB
+
+Queries (with outputs) - MapReduce
+
+1. mydb> db.collection1.insertMany([
+{
+ product: "Product A",
+ category: "Category 1",
+ sales: 100,
+ price: 29.99,
+ status: "active"
+ },
+ {
+ product: "Product B",
+ category: "Category 2",
+ sales: 150,
+ price: 19.99,
+ status: "active"
+ },
+ {
+ product: "Product C",
+ category: "Category 1",
+ sales: 80,
+ price: 39.99,
+ status: "inactive"
+ },
+ {
+ product: "Product D",
+ category: "Category 3",
+ sales: 200,
+ price: 49.99,
+ status: "active"
+ },
+ {
+ product: "Product E",
+ category: "Category 1",
+ sales: [100, 150], 
+ price: 29.99,
+ status: "active"
+ },
+ {
+ product: "Product F",
+ category: "Category 2",
+ sales: [200], 
+ price: 19.99,
+ status: "active"
+ },
+ {
+ product: "Product G",
+ category: "Category 1",
+ sales: [80], 
+ price: 39.99,
+ status: "inactive"
+ },
+ {
+ product: "Product H",
+ category: "Category 3",
+ sales: [300, 100], 
+ price: 49.99,
+ status: "active"
+ }
+ ]);
+
+2. Find sum of prices according to category
+mydb> db.collection1.mapReduce(
+function()
+{
+emit(this.category,this.price);
+},
+function(key,value)
+{
+return Array.sum(value);},
+{
+query:{status:"active"},
+out:"outprice"
+});
+
+3. Find min of price
+mydb> db.collection1.mapReduce(
+function()
+{
+emit(this.category,this.price);
+},
+function(key,value)
+{
+return Math.min.apply(null,value);
+},
+{
+query:{status:"active"},
+out:"minprice"
+});
+-----------------------------------------------------------
+extra
+// 1. Insert documents into collection1
+db.collection1.insertMany([
+    {
+        product: "Product A",
+        category: "Category 1",
+        sales: 100,
+        price: 29.99,
+        status: "active"
+    },
+    {
+        product: "Product B",
+        category: "Category 2",
+        sales: 150,
+        price: 19.99,
+        status: "active"
+    },
+    {
+        product: "Product C",
+        category: "Category 1",
+        sales: 80,
+        price: 39.99,
+        status: "inactive"
+    },
+    {
+        product: "Product D",
+        category: "Category 3",
+        sales: 200,
+        price: 49.99,
+        status: "active"
+    },
+    {
+        product: "Product E",
+        category: "Category 1",
+        sales: [100, 150],
+        price: 29.99,
+        status: "active"
+    },
+    {
+        product: "Product F",
+        category: "Category 2",
+        sales: [200],
+        price: 19.99,
+        status: "active"
+    },
+    {
+        product: "Product G",
+        category: "Category 1",
+        sales: [80],
+        price: 39.99,
+        status: "inactive"
+    },
+    {
+        product: "Product H",
+        category: "Category 3",
+        sales: [300, 100],
+        price: 49.99,
+        status: "active"
+    }
+]);
+
+// 2. Find sum of prices according to category
+db.collection1.mapReduce(
+    function() {
+        emit(this.category, this.price);
+    },
+    function(key, value) {
+        return Array.sum(value);
+    },
+    {
+        query: { status: "active" },
+        out: "outprice"
+    }
+);
+
+// 3. Find minimum of price according to category
+db.collection1.mapReduce(
+    function() {
+        emit(this.category, this.price);
+    },
+    function(key, value) {
+        return Math.min.apply(null, value);
+    },
+    {
+        query: { status: "active" },
+        out: "minprice"
+    }
+);
+
+// 4. Find average price according to category
+db.collection1.mapReduce(
+    function() {
+        emit(this.category, { total: this.price, count: 1 });
+    },
+    function(key, values) {
+        var result = { total: 0, count: 0 };
+        values.forEach(function(v) {
+            result.total += v.total;
+            result.count += v.count;
+        });
+        return result;
+    },
+    {
+        query: { status: "active" },
+        out: "avgprice",
+        finalize: function(key, reducedValue) {
+            return reducedValue.total / reducedValue.count;
+        }
+    }
+);
+
+// Check the results for the sum of prices
+print("Sum of Prices by Category:");
+db.outprice.find().pretty();
+
+// Check the results for the minimum price
+print("Minimum Price by Category:");
+db.minprice.find().pretty();
+
+// Check the results for the average price
+print("Average Price by Category:");
+db.avgprice.find().pretty();

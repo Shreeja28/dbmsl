@@ -1,0 +1,250 @@
+MongoDB Aggregation and Indexing: Implement aggregation and indexing with suitable example using MongoDB.
+
+Queries (with outputs) - AGGREGATE
+
+1. mydb> db.collection1.insertMany([
+{
+ product: "Product A",
+ category: "Category 1",
+ sales: 100,
+ price: 29.99,
+ status: "active"
+ },
+ {
+ product: "Product B",
+ category: "Category 2",
+ sales: 150,
+ price: 19.99,
+ status: "active"
+ },
+ {
+ product: "Product C",
+ category: "Category 1",
+ sales: 80,
+ price: 39.99,
+ status: "inactive"
+ },
+ {
+ product: "Product D",
+ category: "Category 3",
+ sales: 200,
+ price: 49.99,
+ status: "active"
+ }
+ ]);
+
+2. mydb> db.collection1.find().pretty();
+
+3. mydb> db.collection1.aggregate([
+ {
+ $group: {
+ _id: "$category",
+ totalSales: { $sum: "$sales" },
+ productCount: { $count: {} }
+ }
+ }
+ ]);
+
+4. db.collection1.aggregate([{$sort:{sales:-1}},{$limit:2}]);
+
+5. mydb> db.collection1.aggregate([{$project:{product:1,category:1,sales:1}}]);
+
+6. mydb> db.collection1.aggregate([{$sort:{price:1}}]);
+
+7. mydb> db.collection1.aggregate([{$match:{category:"Category 1"}}]);
+
+8. mydb> db.collection1.aggregate([{$addFields:{totalprice:{$multiply:["$sales","$price"]}}}]);
+
+9. mydb> db.collection1.aggregate([{$count:"totalcount"}]);
+
+10. mydb> db.collection1.insertMany([
+ {
+ product: "Product E",
+ category: "Category 1",
+ sales: [100, 150], 
+ price: 29.99,
+ status: "active"
+ },
+ {
+ product: "Product F",
+ category: "Category 2",
+ sales: [200], 
+ price: 19.99,
+ status: "active"
+ },
+ {
+ product: "Product G",
+ category: "Category 1",
+ sales: [80], 
+ price: 39.99,
+ status: "inactive"
+ },
+ {
+ product: "Product H",
+ category: "Category 3",
+ sales: [300, 100], 
+ price: 49.99,
+ status: "active"
+ }
+ ]);
+
+11. mydb> db.collection1.aggregate([{$unwind:"$sales"}]);
+
+12. mydb> db.collection1.mapReduce(function() emit(this.category,this.sales);},function(key,value){return Array.sum(value);},{query:{status:"active"},out:"totalsales"});
+
+Queries (with outputs) - INDEX - 
+
+1. mydb> db.collection1.createIndex({category:1});
+
+2. mydb> db.collection1.getIndexes();
+
+3. mydb> db.collection1.dropIndex("category_1");
+----------------------------------------------------------
+extra
+// Switch to the mydb database
+use mydb;
+
+// Insert initial sample data into collection1
+db.collection1.insertMany([
+    {
+        product: "Product A",
+        category: "Category 1",
+        sales: 100,
+        price: 29.99,
+        status: "active"
+    },
+    {
+        product: "Product B",
+        category: "Category 2",
+        sales: 150,
+        price: 19.99,
+        status: "active"
+    },
+    {
+        product: "Product C",
+        category: "Category 1",
+        sales: 80,
+        price: 39.99,
+        status: "inactive"
+    },
+    {
+        product: "Product D",
+        category: "Category 3",
+        sales: 200,
+        price: 49.99,
+        status: "active"
+    }
+]);
+
+// 1. Find All Documents
+print("All Documents:");
+db.collection1.find().pretty(); // Displays all documents in collection1
+
+// 2. Group by Category with Total Sales and Product Count
+print("Total Sales by Category:");
+db.collection1.aggregate([
+    {
+        $group: {
+            _id: "$category",
+            totalSales: { $sum: "$sales" },
+            productCount: { $sum: 1 } // Use $sum: 1 to count products
+        }
+    }
+]).forEach(printjson); // Outputs total sales and product count per category
+
+// 3. Sort by Sales and Limit to Top 2
+print("Top 2 Products by Sales:");
+db.collection1.aggregate([
+    { $sort: { sales: -1 } },
+    { $limit: 2 }
+]).forEach(printjson); // Displays top 2 products based on sales
+
+// 4. Project Specific Fields (Product, Category, Sales)
+print("Product, Category, and Sales:");
+db.collection1.aggregate([
+    { $project: { product: 1, category: 1, sales: 1 } }
+]).forEach(printjson); // Displays only product, category, and sales
+
+// 5. Sort by Price
+print("Products Sorted by Price:");
+db.collection1.aggregate([
+    { $sort: { price: 1 } }
+]).forEach(printjson); // Displays products sorted by price in ascending order
+
+// 6. Match Documents by Category "Category 1"
+print("Documents in Category 1:");
+db.collection1.aggregate([
+    { $match: { category: "Category 1" } }
+]).forEach(printjson); // Displays documents that belong to "Category 1"
+
+// 7. Add Total Price Field
+print("Documents with Total Price:");
+db.collection1.aggregate([
+    { $addFields: { totalprice: { $multiply: ["$sales", "$price"] } } }
+]).forEach(printjson); // Adds total price field by multiplying sales and price
+
+// 8. Count Total Documents
+print("Total Document Count:");
+db.collection1.aggregate([
+    { $count: "totalcount" }
+]).forEach(printjson); // Outputs total count of documents
+
+// Insert new sample data with sales as arrays
+db.collection1.insertMany([
+    {
+        product: "Product E",
+        category: "Category 1",
+        sales: [100, 150], 
+        price: 29.99,
+        status: "active"
+    },
+    {
+        product: "Product F",
+        category: "Category 2",
+        sales: [200], 
+        price: 19.99,
+        status: "active"
+    },
+    {
+        product: "Product G",
+        category: "Category 1",
+        sales: [80], 
+        price: 39.99,
+        status: "inactive"
+    },
+    {
+        product: "Product H",
+        category: "Category 3",
+        sales: [300, 100], 
+        price: 49.99,
+        status: "active"
+    }
+]);
+
+// 9. Unwind Sales Array
+print("Unwound Sales Array:");
+db.collection1.aggregate([{ $unwind: "$sales" }]).forEach(printjson); // Creates separate documents for each sales entry
+
+// 10. MapReduce to Calculate Total Sales by Category (Active Status)
+print("MapReduce Total Sales by Category (Active Status):");
+db.collection1.mapReduce(
+    function() { emit(this.category, this.sales); },
+    function(key, value) { return Array.sum(value); },
+    { query: { status: "active" }, out: "totalsales" }
+); // Calculates total sales for active products by category
+
+// Queries for Indexing
+// 11. Create an Index on Category
+print("Creating Index on Category:");
+db.collection1.createIndex({ category: 1 }); // Creates an index on the category field
+
+// 12. Get Indexes for the Collection
+print("Indexes in collection1:");
+db.collection1.getIndexes().forEach(printjson); // Displays all indexes in collection1
+
+// 13. Drop the Index on Category
+print("Dropping Index on Category:");
+db.collection1.dropIndex("category_1"); // Drops the index on category field
+
+// Output completion
+print("All operations completed successfully.");

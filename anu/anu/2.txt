@@ -1,0 +1,341 @@
+1. Create Student Table:
+
+CREATE TABLE Student (s_id INT AUTO_INCREMENT PRIMARY KEY, drive_id INT NOT NULL,T_id INT,s_name VARCHAR(50) NOT NULL, cgpa FLOAT,s_branch VARCHAR(50) NOT NULL,s_dob DATE NOT NULL,FOREIGN KEY (T_id) REFERENCES Training(T_id));
+
+2. Create PlacementDrive Table:
+
+create table PlacementDrive(Drive_id int primary key,Pcompany_name varchar(50) not null,package bigint not null,location varchar(50) not null);
+
+3. Create Training Table:
+
+create table Training(T_id int primary key,Tcompany_name varchar(50) not null,T_fee bigint not null,T_year int not null);
+
+4. Create Student view:
+
+create view Student_View as select s_id,drive_id,T_id,s_name,cgpa,s_branch,s_dob from Student;
+
+5. Create index on Student:
+
+create index S_Index on Student(s_name,cgpa);
+
+Assignment Queries:
+
+1. Insert at least 10 records in the Student table and insert other tables accordingly.
+
+Student -
+INSERT INTO Student (s_id, Drive_id, T_id, s_name, CGPA, s_branch, S_dob) 
+VALUES 
+    (1, 101, 1, 'Alana', 8.5, 'Computer Engineering', '2000-01-15'),
+    (2, 102, 2, 'David', 7.8, 'IT', '1999-02-20'),
+    (3, 103, 3, 'Danny', 9.1, 'Electrical Engineering', '2000-03-25'),
+    (4, 104, 4, 'Amalia', 6.9, 'Computer Engineering', '1998-04-30'),
+    (5, 105, 5, 'Diya', 7.2, 'IT', '2000-05-10'),
+    (6, 106, 6, 'Bansi', 6.5, 'Electrical Engineering', '1999-06-15'),
+    (8, 108, 1, 'Dhanashree', 9.0, 'IT', '1998-08-25'),
+    (9, 109, 2, 'Anu', 7.5, 'Electrical Engineering', '1999-09-30'),
+    (10, 110, 3, 'Deepak', 8.3, 'Computer Engineering', '2000-10-10');
+
+PlacementDrive –
+INSERT INTO PlacementDrive (Drive_id, Pcompany_name, package, location) VALUES (1, 'Reliance Industries', 950000.00, 'Mumbai'),(2, 'Flipkart', 900000.00, 'Pune'),(3, 'Aditya Birla Group', 850000.00, 'Bangalore'),(4, 'Mahindra & Mahindra', 920000.00, 'Chennai'),(5, 'Paytm', 870000.00, 'Pune'),(6, 'Ola Cabs', 890000.00, 'Mumbai'),(7, 'Zomato', 860000.00, 'Hyderabad');
+
+Training –
+INSERT INTO Training (T_id, Tcompany_name, T_Fee, T_year) VALUES (1, 'Tata Consultancy Services', 50000.00, 2016),(2, 'Infosys', 60000.00, 2018),(3, 'Wipro', 55000.00, 2020),(4, 'HCL Technologies', 52000.00, 2019),(5, 'Tech Mahindra', 58000.00, 2021),(6, 'Cognizant', 62000.00, 2022),(7, 'Larsen & Toubro Infotech', 57000.00, 2023);
+
+2. Display all students details with branch ‘Computer ‘and ‘It’ and student name starting with 'a' or 'd'.
+
+select * from Student where (s_branch='Computer Engineering' or s_branch='IT') and (s_name like 'A%' or s_name like 'D%');
+
+3. List the number of different companies.(use of distinct)
+
+select distinct Pcompany_name from PlacementDrive;
+
+4. Give 15% increase in fee of the Training whose joining year is 2019.
+
+update Training set T_fee=T_fee+(T_fee*0.15) where T_year=2019;
+
+5. Delete Student details having CGPA score less than 7.
+
+delete from Student where cgpa<7;
+
+6. Find the names of companies belonging to Pune or Mumbai
+
+select Pcompany_name from PlacementDrive where location='Pune' or location='Mumbai';
+
+7. Find the student name who joined training in 1-1-2019 as well as in 1-1-2021
+
+SELECT s.s_name, t.Tcompany_name, t.T_year AS training_year FROM Student s JOIN Training t ON s.T_id = t.T_id WHERE t.T_year IN (2019, 2021);
+
+8. Find the student name having maximum CGPA score and names of students having CGPA score between 7 to 9
+Query for maximum cgpa:
+SELECT s_name, CGPA FROM Student WHERE CGPA = (SELECT MAX(CGPA) FROM Student);
+
+Query for cgpa between 7 to 9:
+SELECT s_name, cgpa FROM Student WHERE cgpa BETWEEN 7 AND 9;
+
+9. Display all Student name with T_id with decreasing order of Fees
+
+SELECT s.s_name, s.T_id, t.T_fee FROM Student s JOIN Training t ON s.T_id = t.T_id ORDER BY t.T_fee DESC;
+
+10. Display PCompany name, S_name ,location and Package with Package 30K, 40K and 50k
+
+SELECT pd.Pcompany_name, s.s_name, pd.location, pd.package FROM PlacementDrive pd JOIN Student s ON pd.Drive_id = s.Drive_id WHERE pd.package=30000 or pd.package=40000 or pd.package=50000;
+
+
+
+
+-------------------------------------------------------
+proper code 
+
+Assignment 2B
+1. Create Student Table:
+Query:
+CREATE TABLE Student (
+    s_id INT PRIMARY KEY, 
+    Drive_id INT, 
+    T_id INT, 
+    s_name VARCHAR(50), 
+    CGPA FLOAT, 
+    s_branch VARCHAR(50), 
+    S_dob DATE, 
+    FOREIGN KEY (Drive_id) REFERENCES PlacementDrive(Drive_id) ON DELETE CASCADE, 
+    FOREIGN KEY (T_id) REFERENCES Training(T_id) ON DELETE CASCADE 
+);
+
+2. Create PlacementDrive Table:
+Query:
+CREATE TABLE PlacementDrive (
+    Drive_id INT PRIMARY KEY, 
+    Pcompany_name VARCHAR(50), 
+    package INT, 
+    location VARCHAR(50)
+);
+
+3. Create Training Table:
+Query:
+CREATE TABLE Training (
+    T_id INT PRIMARY KEY, 
+    Tcompany_name VARCHAR(50), 
+    T_Fee INT, 
+    T_year INT
+);
+
+
+4. Create Student view:
+Query:
+CREATE VIEW Student_View AS 
+SELECT s_id, Drive_id, T_id, s_name, CGPA, s_branch, S_dob FROM Student;
+
+5. Create index on Student:
+Query:
+CREATE INDEX S_Index ON Student(s_name, CGPA);
+
+Assignment Queries:
+1. Insert at least 10 records in the Student table and insert other tables accordingly.
+Query:
+INSERT INTO Student (s_id, Drive_id, T_id, s_name, CGPA, s_branch, S_dob) VALUES 
+(1001, 101, 201, 'John Doe', 8.5, 'Computer Science', '1999-05-15'), 
+(1002, 102, 202, 'Jane Smith', 7.8, 'Electrical Engineering', '2000-11-20'), 
+(1003, 103, 203, 'Michael Johnson', 8.2, 'Computer Science', '1998-03-12'), 
+(1004, 104, 204, 'Emily Davis', 9.0, 'Electrical Engineering', '2001-08-07'), 
+(1005, 105, 205, 'David Lee', 7.5, 'Information Technology', '1999-12-03'), 
+(1006, 106, 206, 'Sarah Kim', 8.7, 'Electrical Engineering', '2000-06-28'), 
+(1007, 107, 207, 'Alex Patel', 8.0, 'Computer Science', '1998-09-22'), 
+(1008, 108, 208, 'Olivia Nguyen', 8.9, 'Information Technology', '2001-04-05'), 
+(1009, 109, 209, 'Ryan Sharma', 7.9, 'Electrical Engineering', '1999-07-18'), 
+(1010, 110, 210, 'Sophia Rao', 8.4, 'Computer Science', '2000-02-14');
+
+PlacementDrive –
+INSERT INTO PlacementDrive (Drive_id, Pcompany_name, package, location) VALUES 
+(101, 'Microsoft', 25, 'Seattle'), 
+(102, 'Google', 30, 'Mountain View'), 
+(103, 'Amazon', 28, 'Seattle'), 
+(104, 'Apple', 32, 'Cupertino'), 
+(105, 'Facebook', 27, 'Menlo Park'), 
+(106, 'IBM', 24, 'New York'), 
+(107, 'Accenture', 23, 'Chicago'), 
+(108, 'Deloitte', 26, 'New York'), 
+(109, 'Infosys', 22, 'Bangalore'), 
+(110, 'TCS', 21, 'Mumbai');
+
+
+
+Training –
+INSERT INTO Training (T_id, Tcompany_name, T_Fee, T_year) VALUES 
+(201, 'Udemy', 500, 2022), 
+(202, 'Coursera', 600, 2021), 
+(203, 'Edx', 450, 2023), 
+(204, 'Udacity', 700, 2020), 
+(205, 'Pluralsight', 550, 2022), 
+(206, 'Skillshare', 400, 2021), 
+(207, 'Udemy', 600, 2023), 
+(208, 'Coursera', 550, 2020), 
+(209, 'Edx', 500, 2022), 
+(210, 'Udacity', 650, 2021);
+
+
+2. Display all students details with branch ‘Computer ‘and ‘Information Technology' and student
+name starting with 'o' or 'j'.
+Query:
+select * from Student where s_branch in ('Computer Science','Information Technology') and
+(s_name LIKE 'O%' or s_name LIKE 'J%');
+
+
+3. List the number of different companies.(use of distinct)
+Query:
+select distinct Pcompany_name from PlacementDrive;
+
+
+4. Give 15% increase in fee of the Training whose joining year is 2021.
+Query:
+update Training set T_fee=T_fee+(T_fee*0.15) where T_year=2021;
+
+
+5. Delete Student details having CGPA score less than 8.
+Query:
+delete from Student where CGPA <8;
+
+6. Find the names of companies belonging to Seattle or Mumbai
+Query:
+select Pcompany_name from PlacementDrive where location='Seattle' or location='Mumbai';
+
+7. Find the student name who joined training in 1-1-2020 as well as in 1-1-2021
+Query:
+SELECT s.s_name, t.Tcompany_name, t.T_year AS training_year FROM Student s JOIN Training t
+ON s.T_id = t.T_id WHERE t.T_year IN (2020, 2021);
+
+
+8. Find the student name having maximum CGPA score and names of students having CGPA score
+between 7 to 9
+Query for maximum cgpa:
+SELECT s_name, CGPA FROM Student WHERE CGPA = (SELECT MAX(CGPA) FROM
+Student);
+
+
+Query for cgpa between 7 to 9:
+SELECT s_name, cgpa FROM Student WHERE cgpa BETWEEN 7 AND 9;
+
+
+9. Display all Student name with T_id with decreasing order of Fees
+Query:
+SELECT s.s_name, s.T_id, t.T_fee FROM Student s JOIN Training t ON s.T_id = t.T_id ORDER
+BY t.T_fee DESC;
+
+
+10. Display PCompany name, S_name ,location and Package with Package 30K, 40K and 50k
+Query:
+SELECT pd.Pcompany_name, s.s_name, pd.location, pd.package FROM PlacementDrive pd JOIN
+Student s ON pd.Drive_id = s.Drive_id WHERE pd.package IN (30, 40, 50);
+
+
+--------------------------------------------------------
+or schema 
+dept project
+CREATE TABLE Dept (
+    Dept_id INT PRIMARY KEY,
+    Dept_name VARCHAR(20),
+    Dept_location VARCHAR(20)
+);
+CREATE TABLE Employee (
+    Emp_id INT PRIMARY KEY,
+    Dept_id INT,
+    Emp_fname VARCHAR(20),
+    Emp_lname VARCHAR(20),
+    Emp_Position VARCHAR(20),
+    Emp_salary FLOAT,
+    Emp_JoinDate DATE,
+    FOREIGN KEY (Dept_id) REFERENCES Dept(Dept_id) ON DELETE CASCADE
+);
+CREATE TABLE Project (
+    Proj_id INT PRIMARY KEY,
+    Dept_id INT,
+    Proj_Name VARCHAR(20),
+    Proj_Location VARCHAR(20),
+    Proj_cost FLOAT,
+    Proj_year YEAR,
+    FOREIGN KEY (Dept_id) REFERENCES Dept(Dept_id) ON DELETE CASCADE
+);
+
+CREATE VIEW Emp_Brief AS SELECT Emp_id, Emp_fname, Emp_salary FROM Employee;
+
+CREATE INDEX ind1 ON Employee(Emp_id);
+
+ALTER TABLE Employee MODIFY COLUMN Emp_id INT AUTO_INCREMENT;
+
+CREATE VIEW Syn_Dept AS SELECT * FROM Dept;
+
+CREATE VIEW Syn_Employee AS SELECT * FROM Employee;
+
+CREATE VIEW Syn_Project AS SELECT * FROM Project;
+
+INSERT INTO Dept VALUES
+(1, 'Computer', 'New York'),
+(2, 'IT', 'San Francisco'),
+(3, 'HR', 'Mumbai'),
+(4, 'Finance', 'Pune'),
+(5, 'Marketing', 'Chicago');
+
+INSERT INTO Employee (Dept_id, Emp_fname, Emp_lname, Emp_Position, Emp_salary, Emp_JoinDate) VALUES
+(1, 'Paul', 'Smith', 'Manager', 45000, '1980-03-22'),
+(2, 'Peter', 'Johnson', 'Analyst', 55000, '1984-06-15'),
+(3, 'Hannah', 'Williams', 'Clerk', 43000, '1990-09-12'),
+(4, 'Phillip', 'Davis', 'Developer', 52000, '1989-05-25'),
+(5, 'Patricia', 'Miller', 'Tester', 48000, '1995-07-19'),
+(1, 'Heather', 'Taylor', 'Support', 43000, '1991-11-05'),
+(2, 'Helen', 'Wilson', 'Admin', 35000, '1992-04-22'),
+(3, 'Mary', 'Moore', 'Consultant', 80000, '1996-01-15'),
+(4, 'Peter', 'Taylor', 'Architect', 65000, '1990-12-11');
+
+INSERT INTO Project VALUES
+(1, 1, 'Alpha', 'New York', 150000, 2004),
+(2, 2, 'Beta', 'San Francisco', 250000, 2005),
+(3, 3, 'Gamma', 'Mumbai', 100000, 2007),
+(4, 4, 'Delta', 'Pune', 300000, 2008),
+(5, 5, 'Epsilon', 'Chicago', 450000, 2009);
+
+-- 2. Display all Employee details with Department ‘Computer’ and ‘IT’ and Employee first name starting with 'P' or 'H'
+SELECT * 
+FROM Employee e 
+INNER JOIN Dept d ON e.Dept_id = d.Dept_id
+WHERE d.Dept_name IN ('Computer', 'IT') 
+AND (e.Emp_fname LIKE 'P%' OR e.Emp_fname LIKE 'H%');
+
+-- 3. List the number of different Employee Positions
+SELECT COUNT(DISTINCT Emp_Position) AS PositionCount 
+FROM Employee;
+
+-- 4. Give 10% increase in Salary of the Employee whose joining year is before 1985
+UPDATE Employee 
+SET Emp_salary = Emp_salary * 1.10 
+WHERE YEAR(Emp_JoinDate) < 1985;
+
+-- 5. Delete Department details where location is ‘Mumbai’
+DELETE FROM Dept 
+WHERE Dept_Location = 'Mumbai';
+
+-- 6. Find the names of Projects with location ‘Pune’
+SELECT Proj_name 
+FROM Project 
+WHERE Proj_Location = 'Pune';
+
+-- 7. Find the project having cost in between 10000 and 50000
+SELECT * 
+FROM Project 
+WHERE Proj_cost BETWEEN 10000 AND 50000;
+
+-- 8. Find the project with maximum price and find average of Project cost
+SELECT * 
+FROM Project 
+WHERE Proj_cost = (SELECT MAX(Proj_cost) FROM Project);
+
+SELECT AVG(Proj_cost) AS Average_cost 
+FROM Project;
+
+-- 9. Display all employees with Emp_id and Emp_name in decreasing order of Emp_lname
+SELECT Emp_id, CONCAT(Emp_fname, ' ', Emp_lname) AS Emp_name 
+FROM Employee 
+ORDER BY Emp_lname DESC;
+
+-- 10. Display Proj_name, Proj_location, and Proj_cost of all projects started in 2004, 2005, or 2007
+SELECT Proj_name, Proj_location, Proj_cost 
+FROM Project 
+WHERE Proj_year IN (2004, 2005, 2007);
